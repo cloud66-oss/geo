@@ -1,0 +1,35 @@
+{
+  "steps": [
+    {
+      "name": "gcr.io/cloud-builders/docker",
+      "args": [
+        "buildx",
+        "create",
+        "--name",
+        "multi-arch-builder",
+        "--driver",
+        "docker-container",
+        "--use"
+      ]
+    },
+    {
+      "name": "gcr.io/cloud-builders/docker",
+      "args": [
+        "buildx",
+        "build",
+        "--progress",
+        "plain",
+        "--platform",
+        "linux/amd64,linux/arm64",
+        "--tag",
+        "us-east4-docker.pkg.dev/production-911/docker-public/geo:${SHORT_SHA}",
+        "--tag",
+        "us-east4-docker.pkg.dev/production-911/docker-public/geo:latest",
+        "--build-arg=SHORT_SHA=${SHORT_SHA}",
+        "--push",
+        "."
+      ]
+    }
+  ],
+  "timeout": "1200s"
+}

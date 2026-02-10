@@ -1,0 +1,79 @@
+# Default provider to use for lookups
+default: maxmind
+
+providers:
+  # Globio databases (country and ASN)
+  globio:
+    enabled: false
+    db:
+      country: dbs/globio-country.mmdb
+      asn: dbs/globio-asn.mmdb
+    download:
+      enabled: true
+      country: "https://s3.amazonaws.com/downloads.cloud66.com/geo-db/"
+      asn: ""
+
+  # MaxMind GeoIP2/GeoLite2 databases
+  maxmind:
+    enabled: true
+    # Direct download from MaxMind (recommended)
+    # Sign up at https://www.maxmind.com/en/geolite2/signup
+    account_id: "" # MaxMind account ID
+    license_key: "" # MaxMind license key
+    editions:
+      city: GeoLite2-City # or GeoIP2-City for paid databases
+      asn: GeoLite2-ASN
+      anonymous: "" # e.g. GeoIP2-Anonymous-IP (paid only)
+    db:
+      city: dbs/geolite2-city.mmdb
+      asn: dbs/geolite2-asn.mmdb
+      anonymous: ""
+    download:
+      enabled: true
+      # Fallback URLs used when license_key is not set
+      # e.g. https://your-host-or-s3/file.mmdb
+      city: ""
+      asn: ""
+      anonymous: ""
+
+  # DbIP databases
+  dbip:
+    enabled: true
+    db:
+      city: dbs/dbip-city-lite.mmdb
+      asn: dbs/dbip-asn-lite.mmdb
+    download:
+      enabled: true
+      # e.g. https://your-host-or-s3/file.mmdb
+      city: ""
+      asn: ""
+
+  # IPStack API-based provider
+  ipstack:
+    enabled: true
+    apikey: ""
+
+  # Cascade provider (multi-provider failover)
+  cascade:
+    enabled: false
+    providers:
+      - maxmind
+      - ipstack
+    stopOnError: false
+
+# Cache configuration
+cache:
+  enabled: true
+  size: 128
+
+# Database refresh interval
+refresh: 24h
+
+# Logging
+log:
+  level: info
+  format: json
+
+# Sentry error tracking (optional)
+sentry:
+  dsn: ""
