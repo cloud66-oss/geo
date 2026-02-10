@@ -1,21 +1,21 @@
 # Default provider to use for lookups
-default: maxmind
+default: globio
 
 providers:
   # Globio databases (country and ASN)
   globio:
-    enabled: false
+    enabled: true
     db:
       country: dbs/globio-country.mmdb
       asn: dbs/globio-asn.mmdb
     download:
       enabled: true
-      country: "https://s3.amazonaws.com/downloads.cloud66.com/geo-db/"
-      asn: ""
+      country: "https://s3.amazonaws.com/downloads.cloud66.com/geo-db/globio-country-latest.mmdb"
+      asn: "https://s3.amazonaws.com/downloads.cloud66.com/geo-db/globio-asn-latest.mmdb"
 
   # MaxMind GeoIP2/GeoLite2 databases
   maxmind:
-    enabled: true
+    enabled: false
     # Direct download from MaxMind (recommended)
     # Sign up at https://www.maxmind.com/en/geolite2/signup
     account_id: "" # MaxMind account ID
@@ -38,7 +38,7 @@ providers:
 
   # DbIP databases
   dbip:
-    enabled: true
+    enabled: false
     db:
       city: dbs/dbip-city-lite.mmdb
       asn: dbs/dbip-asn-lite.mmdb
@@ -50,7 +50,7 @@ providers:
 
   # IPStack API-based provider
   ipstack:
-    enabled: true
+    enabled: false
     apikey: ""
 
   # Cascade provider (multi-provider failover)
