@@ -1,6 +1,7 @@
 .idea
 .claude
 .vscode
+CLAUDE.md
 dbs/*
 geo
 geo.yml
