@@ -15,10 +15,11 @@ import (
 	"github.com/cloud66-oss/geo/utils"
 )
 
-// GlobioProvider is a provider that uses Globio databases (country and ASN)
+// GlobioProvider is a provider that uses Globio databases (country, ASN, and optional anonymous IP)
 type GlobioProvider struct {
-	countryDb *geoip2.Reader
-	asnDb     *geoip2.Reader
+	countryDb   *geoip2.Reader
+	asnDb       *geoip2.Reader
+	anonymousDb *geoip2.Reader
 }
 
 func NewGlobioProvider(ctx context.Context) (*GlobioProvider, error) {
@@ -131,9 +132,23 @@ func (gp *GlobioProvider) Lookup(ctx context.Context, address string, asFallback
 		info.HasASN = true
 	}
 
-	// globio does not have city or anonymous IP data
+	// globio does not have city data
 	info.HasCity = false
-	info.HasAnonymousIP = false
+
+	// query the anonymous IP database if available
+	if gp.anonymousDb != nil {
+		anon, err := gp.anonymousDb.AnonymousIP(ip)
+		if err != nil {
+			return nil, err
+		}
+
+		err = copier.Copy(&info.AnonymousIP, &anon)
+		if err != nil {
+			return nil, err
+		}
+
+		info.HasAnonymousIP = true
+	}
 
 	return info, nil
 }
@@ -145,6 +160,9 @@ func (gp *GlobioProvider) Shutdown(ctx context.Context) {
 	if gp.asnDb != nil {
 		gp.asnDb.Close()
 	}
+	if gp.anonymousDb != nil {
+		gp.anonymousDb.Close()
+	}
 }
 
 func (gp *GlobioProvider) Refresh(ctx context.Context) error {
@@ -155,6 +173,11 @@ func (gp *GlobioProvider) Refresh(ctx context.Context) error {
 
 	// download the ASN database
 	if err := gp.downloadDb(ctx, "asn"); err != nil {
+		return err
+	}
+
+	// download the anonymous IP database (optional)
+	if err := gp.downloadDb(ctx, "anonymous"); err != nil {
 		return err
 	}
 
@@ -175,6 +198,13 @@ func (gp *GlobioProvider) loadDatabases(ctx context.Context) error {
 		return err
 	}
 	gp.asnDb = db
+
+	// load the anonymous IP database (optional)
+	db, err = readGlobioDb(ctx, viper.GetString("providers.globio.db.anonymous"))
+	if err != nil {
+		return err
+	}
+	gp.anonymousDb = db
 
 	return nil
 }

@@ -2,16 +2,18 @@
 default: globio
 
 providers:
-  # Globio databases (country and ASN)
+  # Globio databases (country, ASN, and optional anonymous IP)
   globio:
     enabled: true
     db:
       country: dbs/globio-country.mmdb
       asn: dbs/globio-asn.mmdb
+      anonymous: ""
     download:
       enabled: true
       country: "https://s3.amazonaws.com/downloads.cloud66.com/geo-db/globio-country-latest.mmdb"
       asn: "https://s3.amazonaws.com/downloads.cloud66.com/geo-db/globio-asn-latest.mmdb"
+      anonymous: ""
 
   # MaxMind GeoIP2/GeoLite2 databases
   maxmind:
