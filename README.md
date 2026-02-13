@@ -119,16 +119,18 @@ providers:
     enabled: true
     apikey: ""  # Set via environment variable
 
-  # Globio databases (country and ASN)
+  # Globio databases (country, ASN, and optional anonymous IP)
   globio:
     enabled: false
     db:
       country: dbs/globio-country.mmdb
       asn: dbs/globio-asn.mmdb
+      anonymous: ""
     download:
       enabled: false
       country: ""
       asn: ""
+      anonymous: ""
 
   # Cascade provider (multi-provider failover)
   cascade:
@@ -332,9 +334,9 @@ API-based provider using the IPStack service. Requires an API key.
 
 ### Globio
 
-Uses local Globio databases for country and ASN lookups.
+Uses local Globio databases for country, ASN, and optional anonymous IP lookups.
 
-**Data provided:** Country, ASN
+**Data provided:** Country, ASN, Anonymous IP (optional)
 
 ### Cascade
 
@@ -408,7 +410,7 @@ The included Kubernetes manifest provides:
     │  - MaxMind (city, ASN, anonymous)         │
     │  - DbIP (city data)                       │
     │  - IPStack (API-based)                    │
-    │  - Globio (country + ASN)                  │
+    │  - Globio (country + ASN + anonymous)       │
     │  - Cascade (multi-provider failover)      │
     └────────┬──────────────────────────────────┘
              │
