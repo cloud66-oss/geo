@@ -42,13 +42,15 @@ providers:
   dbip:
     enabled: false
     db:
-      city: dbs/dbip-city-lite.mmdb
-      asn: dbs/dbip-asn-lite.mmdb
+      city: dbs/dbip-city.mmdb
+      asn: dbs/dbip-asn.mmdb
+      country: dbs/dbip-country.mmdb
     download:
       enabled: true
       # e.g. https://your-host-or-s3/file.mmdb
       city: ""
       asn: ""
+      country: ""
 
   # IPStack API-based provider
   ipstack:

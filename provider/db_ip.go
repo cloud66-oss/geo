@@ -16,8 +16,9 @@ import (
 
 // DbIpProvider is a provider that uses DbIP databases
 type DbIpProvider struct {
-	cityDb *geoip2.Reader
-	// asnDb  *geoip2.Reader
+	cityDb    *geoip2.Reader
+	countryDb *geoip2.Reader
+	asnDb     *geoip2.Reader
 }
 
 func NewDbIpProvider(ctx context.Context) (*DbIpProvider, error) {
@@ -104,9 +105,24 @@ func (mmp *DbIpProvider) Lookup(ctx context.Context, address string, asFallback 
 		Traits:             &utils.Traits{},
 	}
 
-	info.HasASN = false
+	// query the ASN database if available
+	if mmp.asnDb != nil {
+		asn, err := mmp.asnDb.ASN(ip)
+		if err != nil {
+			return nil, err
+		}
+
+		err = copier.Copy(&info.ASN, &asn)
+		if err != nil {
+			return nil, err
+		}
+		info.HasASN = true
+	} else {
+		info.HasASN = false
+	}
 
 	if mmp.cityDb != nil {
+		// city db includes country data as well
 		city, err := mmp.cityDb.City(ip)
 		if err != nil {
 			return nil, err
@@ -118,6 +134,19 @@ func (mmp *DbIpProvider) Lookup(ctx context.Context, address string, asFallback 
 		}
 
 		info.HasCity = true
+	} else if mmp.countryDb != nil {
+		// fall back to country-only db when no city db is available
+		country, err := mmp.countryDb.Country(ip)
+		if err != nil {
+			return nil, err
+		}
+
+		err = copier.Copy(&info, &country)
+		if err != nil {
+			return nil, err
+		}
+
+		info.HasCity = false
 	}
 
 	info.HasAnonymousIP = false
@@ -129,9 +158,12 @@ func (mmp *DbIpProvider) Shutdown(ctx context.Context) {
 	if mmp.cityDb != nil {
 		mmp.cityDb.Close()
 	}
-	// if mmp.asnDb != nil {
-	// 	mmp.asnDb.Close()
-	// }
+	if mmp.countryDb != nil {
+		mmp.countryDb.Close()
+	}
+	if mmp.asnDb != nil {
+		mmp.asnDb.Close()
+	}
 }
 
 func (mmp *DbIpProvider) Refresh(ctx context.Context) error {
@@ -144,15 +176,35 @@ func (mmp *DbIpProvider) Refresh(ctx context.Context) error {
 		return err
 	}
 
+	// download the country database
+	if err := mmp.downloadDb(ctx, "country"); err != nil {
+		return err
+	}
+
 	return mmp.loadDatabases(ctx)
 }
 
 func (mmp *DbIpProvider) loadDatabases(ctx context.Context) error {
+	// load the city database
 	db, err := readDbIp(ctx, viper.GetString("providers.dbip.db.city"))
 	if err != nil {
 		return err
 	}
 	mmp.cityDb = db
+
+	// load the country database
+	db, err = readDbIp(ctx, viper.GetString("providers.dbip.db.country"))
+	if err != nil {
+		return err
+	}
+	mmp.countryDb = db
+
+	// load the ASN database
+	db, err = readDbIp(ctx, viper.GetString("providers.dbip.db.asn"))
+	if err != nil {
+		return err
+	}
+	mmp.asnDb = db
 
 	return nil
 }

@@ -45,9 +45,11 @@ func init() {
 
 	serveCmd.PersistentFlags().String("providers.dbip.db.city", "", "DbIp city database")
 	serveCmd.PersistentFlags().String("providers.dbip.db.asn", "", "DbIp ASN database")
+	serveCmd.PersistentFlags().String("providers.dbip.db.country", "", "DbIp country database")
 	serveCmd.PersistentFlags().Bool("providers.dbip.download.enabled", false, "DbIp download enabled")
 	serveCmd.PersistentFlags().String("providers.dbip.download.city", "", "DbIp download city database URL")
 	serveCmd.PersistentFlags().String("providers.dbip.download.asn", "", "DbIp download ASN database URL")
+	serveCmd.PersistentFlags().String("providers.dbip.download.country", "", "DbIp download country database URL")
 	serveCmd.PersistentFlags().Bool("providers.dbip.enabled", false, "DbIp enabled")
 
 	serveCmd.PersistentFlags().String("providers.ipstack.apikey", "", "IPStack API key")
@@ -82,9 +84,11 @@ func init() {
 
 	viper.BindPFlag("providers.dbip.db.city", serveCmd.PersistentFlags().Lookup("providers.dbip.db.city"))
 	viper.BindPFlag("providers.dbip.db.asn", serveCmd.PersistentFlags().Lookup("providers.dbip.db.asn"))
+	viper.BindPFlag("providers.dbip.db.country", serveCmd.PersistentFlags().Lookup("providers.dbip.db.country"))
 	viper.BindPFlag("providers.dbip.download.enabled", serveCmd.PersistentFlags().Lookup("providers.dbip.download.enabled"))
 	viper.BindPFlag("providers.dbip.download.city", serveCmd.PersistentFlags().Lookup("providers.dbip.download.city"))
 	viper.BindPFlag("providers.dbip.download.asn", serveCmd.PersistentFlags().Lookup("providers.dbip.download.asn"))
+	viper.BindPFlag("providers.dbip.download.country", serveCmd.PersistentFlags().Lookup("providers.dbip.download.country"))
 	viper.BindPFlag("providers.dbip.enabled", serveCmd.PersistentFlags().Lookup("providers.dbip.enabled"))
 
 	viper.BindPFlag("providers.ipstack.enabled", serveCmd.PersistentFlags().Lookup("providers.ipstack.enabled"))
@@ -115,9 +119,11 @@ func init() {
 
 	viper.SetDefault("providers.dbip.db.city", "")
 	viper.SetDefault("providers.dbip.db.asn", "")
+	viper.SetDefault("providers.dbip.db.country", "")
 	viper.SetDefault("providers.dbip.download.enabled", false)
 	viper.SetDefault("providers.dbip.download.city", "")
 	viper.SetDefault("providers.dbip.download.asn", "")
+	viper.SetDefault("providers.dbip.download.country", "")
 	viper.SetDefault("providers.dbip.enabled", false)
 
 	viper.SetDefault("providers.ipstack.apikey", "")
