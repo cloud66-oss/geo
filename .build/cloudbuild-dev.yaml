@@ -1,0 +1,30 @@
+steps:
+  # create a multi-arch buildx builder using docker-container driver
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "buildx"
+      - "create"
+      - "--name"
+      - "multi-arch-builder"
+      - "--driver"
+      - "docker-container"
+      - "--use"
+
+  # build and push multi-arch dev image (amd64 + arm64)
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "buildx"
+      - "build"
+      - "--progress"
+      - "plain"
+      - "--platform"
+      - "linux/amd64,linux/arm64"
+      - "--tag"
+      - "${LOCATION}-docker.pkg.dev/${PROJECT_ID}/docker-public/geo:${SHORT_SHA}-dev"
+      - "--tag"
+      - "${LOCATION}-docker.pkg.dev/${PROJECT_ID}/docker-public/geo:latest-dev"
+      - "--build-arg=SHORT_SHA=${SHORT_SHA}-dev"
+      - "--push"
+      - "."
+
+timeout: "1200s"
