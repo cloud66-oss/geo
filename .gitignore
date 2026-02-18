@@ -5,4 +5,5 @@ CLAUDE.md
 dbs/*
 geo
 geo.yml
-
+.build/cloudbuild.json
+.build/cloudbuild-dev.json
